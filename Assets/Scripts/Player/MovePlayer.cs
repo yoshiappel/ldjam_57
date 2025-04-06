@@ -7,26 +7,24 @@ namespace YA
 {
     public class MovePlayer : MonoBehaviour
     {
+        [SerializeField] CameraSwitch cameraSwitch;
+
         private float moveSpeed = 5f;
-        private float jumpForce = 2f;
+        private float jumpForce = 2.5f;
         [SerializeField] private LayerMask groundLayer;
         [SerializeField] private Transform groundCheck;
         private float groundCheckRadius = 0.2f;
-
-        private float fallMultiplier = 2.5f;
 
         [SerializeField] CamShake camShake;
 
         public float Stamina = 10f;
 
         private Rigidbody2D rb;
-        private float moveInput;
+        public float moveInput;
         private bool isInWater;
         private bool isGrounded;
         public bool isMoving;
         public bool isDisquised;
-
-        private bool isAlreadyGrounded;
 
         private Coroutine disquisingCoroutine;
         private bool isTryingToDisguise = false;
@@ -70,16 +68,7 @@ namespace YA
             }
             if (isGrounded)
             {
-                if (!isAlreadyGrounded && Stamina < 10f)
-                {
-                    isAlreadyGrounded = true;
-                    camShake.start = true;
-                }
                 Stamina = 10f;
-            }
-            if (!isGrounded)
-            {
-                isAlreadyGrounded = false;
             }
             if (rb.velocity.x != 0)
             {
@@ -103,6 +92,24 @@ namespace YA
             {
                 Debug.Log("Hit");
             }
+
+        }
+
+        private void OnTriggerStay2D(Collider2D collision)
+        {
+            if (collision.CompareTag("water"))
+            {
+                isInWater = true;
+            }
+            if (collision.CompareTag("scene1"))
+                cameraSwitch.SwitchCam(1);
+            if (collision.CompareTag("scene2"))
+                cameraSwitch.SwitchCam(2);
+            if (collision.CompareTag("scene3"))
+                cameraSwitch.SwitchCam(3);
+            if (collision.CompareTag("scene4"))
+                cameraSwitch.SwitchCam(4);
+
         }
 
         private void OnTriggerExit2D(Collider2D collision)
@@ -118,11 +125,6 @@ namespace YA
             rb.velocity = new Vector2(moveInput * moveSpeed, rb.velocity.y);
 
             isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
-
-            if (rb.velocity.y < 0)
-            {
-                rb.velocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.fixedDeltaTime;
-            }
         }
 
         private IEnumerator Disquising()

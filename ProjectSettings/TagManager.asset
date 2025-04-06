@@ -7,6 +7,10 @@ TagManager:
   - enemy
   - water
   - player
+  - scene1
+  - scene2
+  - scene3
+  - scene4
   layers:
   - Default
   - TransparentFX
