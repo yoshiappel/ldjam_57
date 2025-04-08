@@ -12,7 +12,7 @@ namespace YA
 
         [SerializeField] Transform player;
         [SerializeField] float moveSpeed = 2f;
-        [SerializeField] float followRange = 10f;
+        [SerializeField] float followRange = 10000f;
         [SerializeField] float stopDistance = 0.5f;
 
         [SerializeField] Transform pointA;
@@ -25,6 +25,8 @@ namespace YA
         {
             currentTarget = pointA;
             exclamationMark.SetActive(false);
+            player = GameObject.FindGameObjectWithTag("player").transform;
+            movePlayer = player.GetComponent<MovePlayer>();
         }
 
         private void Update()
@@ -78,11 +80,11 @@ namespace YA
             Vector3 scale = transform.localScale;
             if (targetX < transform.position.x)
             {
-                scale.x = -1;
+                scale.x = -2;
             }
             else
             {
-                scale.x = 1;
+                scale.x = 2;
             }
             transform.localScale = scale;
         }

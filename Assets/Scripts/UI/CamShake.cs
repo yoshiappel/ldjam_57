@@ -21,19 +21,18 @@ namespace YA
 
         public IEnumerator Shaking()
         {
-            Vector3 startPos = transform.position;
+            Vector3 startPos = transform.localPosition;
             float elapsedTime = 0f;
 
             while (elapsedTime < duration)
             {
                 elapsedTime += Time.deltaTime;
                 float strength = curve.Evaluate(elapsedTime / duration);
-                transform.position = startPos + Random.insideUnitSphere * strength;
+                transform.localPosition = startPos + Random.insideUnitSphere * strength;
                 yield return null;
             }
 
-            transform.position = startPos;
-
+            transform.localPosition = startPos;
         }
     }
 }

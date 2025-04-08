@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 
 namespace YA
@@ -64,6 +65,12 @@ namespace YA
             SettingsSection.SetActive(false);
             NameSection.SetActive(false);
         }
+
+        public void GoToMainMenu()
+        {
+            SceneManager.LoadScene(0);
+        }
+
 
         private void AnimSubTitle()
         {

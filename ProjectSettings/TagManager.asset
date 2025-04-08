@@ -11,6 +11,15 @@ TagManager:
   - scene2
   - scene3
   - scene4
+  - attack
+  - boss
+  - bossfight
+  - point1
+  - point2
+  - name
+  - normalTxt
+  - leviTxt
+  - camera
   layers:
   - Default
   - TransparentFX

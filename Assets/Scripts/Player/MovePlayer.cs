@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace YA
 {
@@ -13,7 +14,9 @@ namespace YA
         private float jumpForce = 2.5f;
         [SerializeField] private LayerMask groundLayer;
         [SerializeField] private Transform groundCheck;
-        private float groundCheckRadius = 0.2f;
+        private float groundCheckRadius = 0.3f;
+
+        bool one = false;
 
         [SerializeField] CamShake camShake;
 
@@ -22,12 +25,21 @@ namespace YA
         private Rigidbody2D rb;
         public float moveInput;
         private bool isInWater;
-        private bool isGrounded;
+        public bool isGrounded;
         public bool isMoving;
         public bool isDisquised;
 
         private Coroutine disquisingCoroutine;
         private bool isTryingToDisguise = false;
+
+        [SerializeField] GameObject projectilePrefab;
+        [SerializeField] Transform firePoint;
+        [SerializeField] float fireRate = 0.2f; 
+
+        private float fireCooldown;
+
+        public bool isBossFight = false;
+
 
         private void Start()
         {
@@ -68,7 +80,16 @@ namespace YA
             }
             if (isGrounded)
             {
+                if (!one)
+                {
+                    one = true;
+                    camShake.start = true;
+                }
                 Stamina = 10f;
+            }
+            else if (!isGrounded) 
+            {
+                one = false;
             }
             if (rb.velocity.x != 0)
             {
@@ -79,7 +100,18 @@ namespace YA
                 isMoving = false;
             }
 
+            AimAtMouse();
 
+            if (Input.GetMouseButton(0) && fireCooldown <= 0f)
+            {
+                Fire();
+                fireCooldown = fireRate;
+            }
+
+            if (fireCooldown > 0f)
+            {
+                fireCooldown -= Time.deltaTime;
+            }
         }
 
         private void OnTriggerEnter2D(Collider2D collision)
@@ -88,11 +120,14 @@ namespace YA
             {
                 isInWater = true;
             }
-            if (collision.CompareTag("enemy") && !isDisquised)
+            if (collision.CompareTag("enemy") || collision.CompareTag("attack") || collision.CompareTag("boss"))
             {
-                Debug.Log("Hit");
+                Hit();
             }
-
+            if (collision.CompareTag("bossfight"))
+            {
+                SceneManager.LoadScene(2);
+            }
         }
 
         private void OnTriggerStay2D(Collider2D collision)
@@ -101,6 +136,7 @@ namespace YA
             {
                 isInWater = true;
             }
+            // sadly couldnt use this bc of time
             if (collision.CompareTag("scene1"))
                 cameraSwitch.SwitchCam(1);
             if (collision.CompareTag("scene2"))
@@ -154,6 +190,35 @@ namespace YA
             Debug.Log("Disguised!");
             isTryingToDisguise = false;
             disquisingCoroutine = null;
+        }
+
+        private void AimAtMouse()
+        {
+            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector2 direction = (mouseWorldPos - firePoint.position).normalized;
+
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            firePoint.rotation = Quaternion.Euler(0, 0, angle);
+        }
+
+        private void Fire()
+        {
+            if (isBossFight)
+            {
+                Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                Vector2 direction = (mouseWorldPos - firePoint.position).normalized;
+
+                GameObject proj = Instantiate(projectilePrefab, firePoint.position, Quaternion.identity);
+
+                PlayerProjectile projectile = proj.GetComponent<PlayerProjectile>();
+                projectile.SetDirection(direction);
+            }
+        }
+
+        private void Hit()
+        {
+            Debug.Log("hit");
+            SceneManager.LoadScene(4);
         }
 
     }
